@@ -1,0 +1,10 @@
+# Dependencies and local build/runtime artifacts — never source.
+# NOTE: static/ (the built SPA) is intentionally tracked: the Databricks Apps
+# deploy uploads it, and `databricks sync` honours this file, so ignoring it
+# would break the deploy.
+frontend/node_modules/
+frontend/*.tsbuildinfo
+.venv/
+__pycache__/
+*.pyc
+.DS_Store

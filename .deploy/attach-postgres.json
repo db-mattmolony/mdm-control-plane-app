@@ -1,0 +1,15 @@
+{
+  "update_mask": "resources",
+  "app": {
+    "resources": [
+      {
+        "name": "postgres",
+        "postgres": {
+          "branch": "projects/mdm-article-master/branches/production",
+          "database": "projects/mdm-article-master/branches/production/databases/databricks-postgres",
+          "permission": "CAN_CONNECT_AND_CREATE"
+        }
+      }
+    ]
+  }
+}
