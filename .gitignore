@@ -8,3 +8,7 @@ frontend/*.tsbuildinfo
 __pycache__/
 *.pyc
 .DS_Store
+
+# Real 7-Eleven vendor->region mapping (customer data) — do NOT publish.
+# Regenerate locally from the source spreadsheet with db/seed_data/build_seed.py.
+db/seed_data/vendor_supply_region.csv

@@ -16,11 +16,10 @@ VENDOR_SUPPLY_AUTHORISATION = DomainConfig(
     uc_target="7_eleven_hackathon_catalog.mdm.vendor_supply_authorisation",
     fields=[
         FieldSpec("vendor_id", "Vendor ID", "text", help="SAP vendor number"),
-        FieldSpec("vendor_name", "Vendor name", "text"),
+        FieldSpec("vendor_name", "Vendor name", "text",
+                  help="Synthetic for now — to be sourced from SAP vendor master later"),
+        FieldSpec("country_key", "Country", "text", help="SAP country key (e.g. AU)"),
         FieldSpec("supply_region", "Supply Region", "lookup", lookup="supply_region"),
-        FieldSpec("supply_method", "Supply Method", "lookup", lookup="supply_method"),
-        FieldSpec("merchandise_category", "Merchandise Category", "lookup",
-                  lookup="merchandise_category"),
         # Effective dating is maintained by the app, not entered by the user:
         # from_date is set on creation, to_date is set when the row is retired.
         # These drive the derived status but are never shown or configured.
@@ -28,12 +27,11 @@ VENDOR_SUPPLY_AUTHORISATION = DomainConfig(
         FieldSpec("to_date", "Effective to", "date", required=False, user_managed=False),
     ],
     list_columns=[
-        "mapping_id", "vendor_id", "vendor_name", "supply_region",
-        "supply_method", "merchandise_category", "status",
-        "updated_by", "updated_at",
+        "mapping_id", "vendor_id", "vendor_name", "country_key",
+        "supply_region", "status", "updated_by", "updated_at",
     ],
     search_fields=["vendor_id", "vendor_name"],
-    filter_fields=["supply_region", "supply_method", "merchandise_category"],
-    business_key=["vendor_id", "supply_region", "merchandise_category"],
+    filter_fields=["supply_region"],
+    business_key=["vendor_id", "supply_region"],
     coverage_dimension="supply_region",
 )

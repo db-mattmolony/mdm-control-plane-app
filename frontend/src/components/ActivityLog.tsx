@@ -22,7 +22,7 @@ export default function ActivityLog({ onClose }: Props) {
   const summarise = (r: AuditRow): string => {
     const after = r.after_json ?? {};
     const bits: string[] = [];
-    for (const k of ["vendor_name", "supply_region", "supply_method", "merchandise_category", "name"]) {
+    for (const k of ["vendor_name", "vendor_id", "country_key", "supply_region", "name"]) {
       if (after[k]) bits.push(String(after[k]));
     }
     return bits.join(" · ");

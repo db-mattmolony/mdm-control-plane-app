@@ -54,6 +54,27 @@ def insert(table: str, data: dict[str, Any], returning: str | None = None) -> An
         return row[returning] if row else None
 
 
+def bulk_insert(table: str, rows: list[dict[str, Any]]) -> int:
+    """Insert many rows in a single transaction (one commit).
+
+    Used for the initial seed load — the per-row insert() commits every row,
+    which is unworkable for thousands of rows. All rows must share the same
+    columns (taken from the first row).
+    """
+    if not rows:
+        return 0
+    cols = list(rows[0].keys())
+    query = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(
+        _tbl(table),
+        sql.SQL(", ").join(map(sql.Identifier, cols)),
+        sql.SQL(", ").join(sql.Placeholder() * len(cols)),
+    )
+    with get_connection() as conn:
+        conn.cursor().executemany(query, [tuple(r[c] for c in cols) for r in rows])
+        conn.commit()
+    return len(rows)
+
+
 def update(table: str, pk_col: str, pk_val: Any, data: dict[str, Any]) -> None:
     assignments = sql.SQL(", ").join(
         sql.SQL("{} = %s").format(sql.Identifier(c)) for c in data

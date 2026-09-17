@@ -23,28 +23,12 @@ CREATE TABLE IF NOT EXISTS {SCHEMA}.supply_region (
     sort_order   int NOT NULL DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS {SCHEMA}.supply_method (
-    id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name          text UNIQUE NOT NULL,
-    poc_topology  text,
-    is_active     boolean NOT NULL DEFAULT true,
-    sort_order    int NOT NULL DEFAULT 0
-);
-
-CREATE TABLE IF NOT EXISTS {SCHEMA}.merchandise_category (
-    id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name        text UNIQUE NOT NULL,
-    is_active   boolean NOT NULL DEFAULT true,
-    sort_order  int NOT NULL DEFAULT 0
-);
-
 CREATE TABLE IF NOT EXISTS {SCHEMA}.vendor_supply_authorisation (
     mapping_id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     vendor_id             text NOT NULL,
     vendor_name           text NOT NULL,
+    country_key           text NOT NULL DEFAULT 'AU',
     supply_region         text NOT NULL,
-    supply_method         text NOT NULL,
-    merchandise_category  text NOT NULL,
     from_date             date NOT NULL,
     to_date               date,
     created_by            text,
