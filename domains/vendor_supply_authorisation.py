@@ -26,10 +26,9 @@ VENDOR_SUPPLY_AUTHORISATION = DomainConfig(
         FieldSpec("from_date", "Effective from", "date", user_managed=False),
         FieldSpec("to_date", "Effective to", "date", required=False, user_managed=False),
     ],
-    list_columns=[
-        "mapping_id", "vendor_id", "vendor_name", "country_key",
-        "supply_region", "status", "updated_by", "updated_at",
-    ],
+    # Grid mirrors the source table (Vendor, Country Key, Supply region) + vendor name.
+    # Status / audit / IDs stay in the model and record detail, just not in the grid.
+    list_columns=["vendor_id", "vendor_name", "country_key", "supply_region"],
     search_fields=["vendor_id", "vendor_name"],
     filter_fields=["supply_region"],
     business_key=["vendor_id", "supply_region"],
