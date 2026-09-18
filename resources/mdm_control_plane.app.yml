@@ -1,0 +1,14 @@
+resources:
+  apps:
+    mdm_control_plane:
+      name: mdm-control-plane
+      description: 7-Eleven Article Master — operational control plane (React + FastAPI)
+      # Source lives at the repo root (not src/app), so point one level up from
+      # this resources/ file. app.yaml there carries the start command + env.
+      source_code_path: ..
+      resources:
+        - name: postgres
+          postgres:
+            branch: projects/mdm-article-master/branches/production
+            database: projects/mdm-article-master/branches/production/databases/databricks-postgres
+            permission: CAN_CONNECT_AND_CREATE

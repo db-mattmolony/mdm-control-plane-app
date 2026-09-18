@@ -1,0 +1,27 @@
+# Databricks Asset Bundle for the MDM control-plane app.
+#
+# Deploys the existing Databricks App (mdm-control-plane) declaratively, instead
+# of the imperative `databricks sync` + `databricks apps deploy` flow. The app's
+# start command and environment live in app.yaml (the source dir); the Lakebase
+# Postgres resource is declared in resources/mdm_control_plane.app.yml.
+bundle:
+  name: mdm-control-plane
+
+include:
+  - resources/*.yml
+
+# The real vendor->region seed CSV is gitignored (customer data kept out of the
+# public repo), but the app needs it at deploy time to seed. Force it into the
+# bundle upload here — this does not commit it to git.
+sync:
+  include:
+    - db/seed_data/vendor_supply_region.csv
+
+targets:
+  hackathon:
+    mode: production
+    default: true
+    workspace:
+      host: https://fevm-7-eleven-hackathon.cloud.databricks.com
+      profile: 711-hackathon
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
