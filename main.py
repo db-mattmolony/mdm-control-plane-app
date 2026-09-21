@@ -188,7 +188,16 @@ def api_bulk_commit(body: BulkIn, ident: Identity = Depends(identity)):
 
 @app.get("/api/health")
 def api_health():
-    return {"status": "ok", "db_ready": _db_ready, "db_error": _db_error}
+    import os
+    # Diagnostic: which Lakebase/Postgres env vars the platform injected (NAMES
+    # only — never values). Helps confirm connectivity wiring on a new workspace.
+    injected = sorted(
+        k for k in os.environ
+        if k.startswith("PG") or "LAKEBASE" in k or "POSTGRES" in k
+        or k.startswith("DATABRICKS_DATABASE")
+    )
+    return {"status": "ok", "db_ready": _db_ready, "db_error": _db_error,
+            "pg_env_keys": injected}
 
 
 # --- static SPA (registered last so /api/* wins) -----------------------------

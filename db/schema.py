@@ -23,12 +23,14 @@ CREATE TABLE IF NOT EXISTS {SCHEMA}.supply_region (
     sort_order   int NOT NULL DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS {SCHEMA}.vendor_supply_authorisation (
+CREATE TABLE IF NOT EXISTS {SCHEMA}.article_availability_override (
     mapping_id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    article               text NOT NULL,
     vendor_id             text NOT NULL,
-    vendor_name           text NOT NULL,
+    vendor_name           text,
     country_key           text NOT NULL DEFAULT 'AU',
     supply_region         text NOT NULL,
+    available_to_buy      text NOT NULL DEFAULT 'No',
     from_date             date NOT NULL,
     to_date               date,
     created_by            text,

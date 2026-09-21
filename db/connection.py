@@ -21,10 +21,14 @@ import psycopg
 from psycopg.rows import dict_row
 
 # --- Project fallbacks (used only when the platform env vars are absent) ------
-PROJECT_ID = "mdm-article-master"
-BRANCH = "production"
+# Overridable via env so a new workspace only needs LAKEBASE_PROJECT set (the
+# deploy script creates a project of the same name). On Databricks Apps the
+# platform injects PGHOST/PGUSER/PGDATABASE/LAKEBASE_ENDPOINT, so these
+# fallbacks are used mainly for local development.
+PROJECT_ID = os.environ.get("LAKEBASE_PROJECT", "mdm-article-master")
+BRANCH = os.environ.get("LAKEBASE_BRANCH", "production")
 ENDPOINT_PATH = f"projects/{PROJECT_ID}/branches/{BRANCH}/endpoints/primary"
-SCHEMA = "mdm"
+SCHEMA = os.environ.get("LAKEBASE_SCHEMA", "mdm")
 
 _TOKEN_TTL = 3600          # Lakebase OAuth tokens last 1 hour
 _TOKEN_REFRESH_MARGIN = 300  # refresh 5 min early

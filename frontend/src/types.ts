@@ -3,9 +3,10 @@ export type Status = "Active" | "Future" | "Expired" | "Missing";
 export interface FieldSpec {
   name: string;
   label: string;
-  kind: "text" | "date" | "lookup";
+  kind: "text" | "date" | "lookup" | "choice";
   required: boolean;
   lookup: string | null;
+  options: string[] | null;
   help: string | null;
   user_managed: boolean;
 }

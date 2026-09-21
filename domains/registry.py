@@ -7,10 +7,10 @@ configs and produces the list / add / edit / retire screens with no UI changes.
 from __future__ import annotations
 
 from domains.config_types import DomainConfig, FieldSpec  # noqa: F401 (re-exported)
-from domains.vendor_supply_authorisation import VENDOR_SUPPLY_AUTHORISATION
+from domains.article_availability_override import ARTICLE_AVAILABILITY_OVERRIDE
 
 DOMAINS: list[DomainConfig] = [
-    VENDOR_SUPPLY_AUTHORISATION,
+    ARTICLE_AVAILABILITY_OVERRIDE,
     # Add future master-data domains here — config only, no UI changes.
 ]
 

@@ -53,6 +53,7 @@ def _field_descriptor(f) -> dict:
         "kind": f.kind,
         "required": f.required,
         "lookup": f.lookup,
+        "options": list(f.options) if f.options else None,
         "help": f.help,
         "user_managed": f.user_managed,
     }
@@ -178,6 +179,7 @@ def _jsonable(d: dict) -> dict:
 
 def create(values: dict, user: str) -> dict:
     vals = _clean(values)
+    vals.setdefault("available_to_buy", "No")   # default when omitted
     vals["from_date"] = date.today()   # app-managed, hidden
     vals["to_date"] = None
     existing = repo.fetch_all(DOMAIN.table)

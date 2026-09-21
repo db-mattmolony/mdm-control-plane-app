@@ -2,13 +2,16 @@ resources:
   apps:
     mdm_control_plane:
       name: mdm-control-plane
-      description: 7-Eleven Article Master — operational control plane (React + FastAPI)
+      description: 7-Eleven Article Master — Article Availability Override control plane (React + FastAPI)
       # Source lives at the repo root (not src/app), so point one level up from
-      # this resources/ file. app.yaml there carries the start command + env.
+      # this resources/ file. app.yaml there carries the start command + env
+      # (including LAKEBASE_ENDPOINT — the platform injects PGHOST/PGUSER but not
+      # the endpoint path; deploy.sh keeps app.yaml's endpoint in sync with the
+      # chosen --project).
       source_code_path: ..
       resources:
         - name: postgres
           postgres:
-            branch: projects/mdm-article-master/branches/production
-            database: projects/mdm-article-master/branches/production/databases/databricks-postgres
+            branch: projects/${var.postgres_project}/branches/production
+            database: ${var.postgres_database}
             permission: CAN_CONNECT_AND_CREATE

@@ -16,7 +16,17 @@ export default function EditorPanel({ boot, row, onClose, onSaved }: Props) {
 
   const initial = useMemo(() => {
     const v: Record<string, string> = {};
-    for (const f of domain.fields) v[f.name] = (row?.[f.name] ?? "") as string;
+    for (const f of domain.fields) {
+      const existing = row?.[f.name];
+      if (existing != null && existing !== "") {
+        v[f.name] = String(existing);
+      } else if (f.kind === "choice" && f.options?.length) {
+        // Default a new override's choice to "No" (else the first option).
+        v[f.name] = f.options.includes("No") ? "No" : f.options[0];
+      } else {
+        v[f.name] = "";
+      }
+    }
     return v;
   }, [row, domain]);
 
@@ -57,7 +67,7 @@ export default function EditorPanel({ boot, row, onClose, onSaved }: Props) {
     try {
       const res = isEdit ? await api.update(pk!, values) : await api.create(values);
       if (res.ok) {
-        onSaved(isEdit ? "Changes saved." : "Authorisation added.");
+        onSaved(isEdit ? "Changes saved." : "Override added.");
       } else {
         setValidation({ errors: res.errors ?? ["Save failed."], coverage: { fills_gap: false, dimension: null, value: null } });
       }
@@ -72,7 +82,7 @@ export default function EditorPanel({ boot, row, onClose, onSaved }: Props) {
     setSaving(true);
     try {
       const res = await api.retire(pk!);
-      if (res.ok) onSaved(`Retired #${pk} (expired today).`);
+      if (res.ok) onSaved(`Override #${pk} removed (expired today).`);
       else setValidation({ errors: res.errors ?? ["Retire failed."], coverage: { fills_gap: false, dimension: null, value: null } });
     } finally {
       setSaving(false);
@@ -82,11 +92,11 @@ export default function EditorPanel({ boot, row, onClose, onSaved }: Props) {
   const fmtTs = (ts?: string) => (ts ? new Date(ts).toLocaleString() : "—");
 
   return (
-    <div className="panel-inner" role="dialog" aria-label="Authorisation editor">
+    <div className="panel-inner" role="dialog" aria-label="Availability override editor">
       <div className="panel-hdr">
         <div>
           <div className="ptitle">
-            {isEdit ? `#${pk} · ${row?.vendor_name ?? ""}` : "New authorisation"}
+            {isEdit ? `#${pk} · Article ${row?.article ?? ""}` : "New override"}
           </div>
           <div className="psub">
             {isEdit ? (
@@ -97,7 +107,7 @@ export default function EditorPanel({ boot, row, onClose, onSaved }: Props) {
                 </span>
               </>
             ) : (
-              "Create a vendor supply authorisation"
+              "Create an availability override"
             )}
           </div>
         </div>
@@ -120,6 +130,12 @@ export default function EditorPanel({ boot, row, onClose, onSaved }: Props) {
                 {values[f.name] && !(lookups[f.lookup ?? ""] ?? []).includes(values[f.name]) && (
                   <option value={values[f.name]}>{values[f.name]} (inactive)</option>
                 )}
+              </select>
+            ) : f.kind === "choice" ? (
+              <select value={values[f.name] ?? ""} onChange={(e) => set(f.name, e.target.value)}>
+                {(f.options ?? []).map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
               </select>
             ) : (
               <input
@@ -148,14 +164,14 @@ export default function EditorPanel({ boot, row, onClose, onSaved }: Props) {
           </div>
         )}
         {!hasErrors && validation && !validation.coverage?.fills_gap && requiredFilled && (
-          <div className="val-box ok">✓ Looks good — no conflicts with existing authorisations.</div>
+          <div className="val-box ok">✓ Looks good — no conflict with an existing override.</div>
         )}
 
         {isEdit && (
           <div className="retire-zone">
-            <div className="lbl">Retire this authorisation</div>
+            <div className="lbl">Remove this override</div>
             <p>
-              Soft-delete: the row is expired as of today and drops out of active views, but is
+              Soft-delete: the override is expired as of today and drops out of active views, but is
               never destroyed — history and lineage are preserved.
             </p>
             <label className="checkrow">
@@ -164,10 +180,10 @@ export default function EditorPanel({ boot, row, onClose, onSaved }: Props) {
                 checked={confirmRetire}
                 onChange={(e) => setConfirmRetire(e.target.checked)}
               />
-              I want to retire this authorisation
+              I want to remove this override
             </label>
             <button className="btn danger sm" disabled={!confirmRetire || saving} onClick={retire}>
-              Retire authorisation
+              Remove override
             </button>
           </div>
         )}
@@ -175,7 +191,7 @@ export default function EditorPanel({ boot, row, onClose, onSaved }: Props) {
 
       <div className="panel-foot">
         <button className="btn" disabled={!canSave} onClick={save}>
-          {saving ? "Saving…" : isEdit ? "Save changes" : "Save authorisation"}
+          {saving ? "Saving…" : isEdit ? "Save changes" : "Save override"}
         </button>
         <button className="btn ghost" onClick={onClose}>Cancel</button>
       </div>

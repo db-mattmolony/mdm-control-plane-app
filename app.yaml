@@ -2,3 +2,16 @@ command:
   - sh
   - -c
   - uvicorn main:app --host 0.0.0.0 --port ${DATABRICKS_APP_PORT:-8000}
+env:
+  # The platform injects PGHOST/PGPORT/PGDATABASE/PGUSER for the attached postgres
+  # resource, but NOT the endpoint path needed to mint OAuth tokens — so we set it
+  # here. These point at the DEFAULT project id; deploy.sh rewrites them for this
+  # deploy when a different --project is chosen (and restores app.yaml after).
+  - name: LAKEBASE_ENDPOINT
+    value: projects/mdm-article-master/branches/production/endpoints/primary
+  - name: LAKEBASE_PROJECT
+    value: mdm-article-master
+  # Unity Catalog catalog for the governed target shown in the UI footer. Change
+  # per workspace (the Lakebase->UC sync is scoped but not yet built).
+  - name: UC_CATALOG
+    value: "7_eleven_hackathon_catalog"

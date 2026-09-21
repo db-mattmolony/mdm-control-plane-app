@@ -12,9 +12,10 @@ from dataclasses import dataclass, field
 class FieldSpec:
     name: str
     label: str
-    kind: str = "text"            # text | date | lookup
+    kind: str = "text"            # text | date | lookup | choice
     required: bool = True
     lookup: str | None = None     # reference-list key when kind == "lookup"
+    options: tuple[str, ...] | None = None  # fixed options when kind == "choice"
     help: str | None = None
     in_list: bool = True          # show in the browse table
     editable: bool = True         # editable on the edit form

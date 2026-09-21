@@ -8,10 +8,11 @@ import ActivityLog from "./components/ActivityLog";
 
 const COLUMN_LABELS: Record<string, string> = {
   mapping_id: "ID",
-  vendor_id: "Vendor ID",
-  vendor_name: "Vendor",
+  article: "Article",
+  vendor_id: "Vendor",
   country_key: "Country",
   supply_region: "Supply Region",
+  available_to_buy: "Available to buy",
   status: "Status",
   updated_by: "Last changed by",
   updated_at: "Last changed at",
@@ -80,8 +81,8 @@ export default function App() {
     const active = rows.filter((r) => r.status === "Active").length;
     const future = rows.filter((r) => r.status === "Future").length;
     const expired = rows.filter((r) => r.status === "Expired").length;
-    return { total, active, future, expired, gaps: coverage?.gaps.length ?? 0 };
-  }, [rows, coverage]);
+    return { total, active, future, expired };
+  }, [rows]);
 
   const afterWrite = async (msg: string) => {
     await loadData();
@@ -110,7 +111,7 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `vendor_supply_authorisation_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `article_availability_override_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -170,11 +171,10 @@ export default function App() {
       )}
 
       <div className="kpis">
-        <div className="kpi"><div className="v">{kpis.total}</div><div className="l">Authorisations</div></div>
+        <div className="kpi"><div className="v">{kpis.total}</div><div className="l">Overrides</div></div>
         <div className="kpi"><div className="v">{kpis.active}</div><div className="l">Active</div></div>
         <div className="kpi warn"><div className="v">{kpis.future}</div><div className="l">Future-dated</div></div>
         <div className="kpi bad"><div className="v">{kpis.expired}</div><div className="l">Expired</div></div>
-        <div className={`kpi ${kpis.gaps ? "bad" : ""}`}><div className="v">{kpis.gaps}</div><div className="l">Coverage gaps</div></div>
       </div>
 
       <div className="work">
@@ -208,7 +208,7 @@ export default function App() {
 
           <div className="grid-scroll">
             {filtered.length === 0 ? (
-              <div className="empty">No authorisations match your filters.</div>
+              <div className="empty">No overrides match your filters.</div>
             ) : (
               <table className="grid">
                 <thead>
@@ -286,7 +286,7 @@ function Header({
       <img className="mark-img" src={`${import.meta.env.BASE_URL}logo.webp`} alt="7-Eleven" />
       <div className="hdr-title">
         <div className="t1">Article Master</div>
-        <div className="t2">Vendor Supply Authorisation · Control Plane</div>
+        <div className="t2">Article Availability Override · Control Plane</div>
       </div>
       <div className="hdr-spacer" />
       {boot && (

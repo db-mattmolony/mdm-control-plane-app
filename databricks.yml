@@ -1,14 +1,28 @@
 # Databricks Asset Bundle for the MDM control-plane app.
 #
-# Deploys the existing Databricks App (mdm-control-plane) declaratively, instead
-# of the imperative `databricks sync` + `databricks apps deploy` flow. The app's
-# start command and environment live in app.yaml (the source dir); the Lakebase
-# Postgres resource is declared in resources/mdm_control_plane.app.yml.
+# Deploys the Databricks App (mdm-control-plane) and attaches its Lakebase
+# Postgres. The Lakebase project itself is created by `deploy.sh` (DABs cannot
+# create an Autoscaling Lakebase project declaratively — see that script), which
+# then runs this bundle. The app self-seeds its schema + the LFLR data on first
+# open, so there is no separate data-upload step.
+#
+# Deploy to a brand-new workspace with a single command:
+#   ./deploy.sh --profile <your-profile>
 bundle:
   name: mdm-control-plane
 
 include:
   - resources/*.yml
+
+# Parameterised so a new workspace needs no edits here — deploy.sh discovers the
+# real Lakebase paths and passes them in with --var.
+variables:
+  postgres_project:
+    description: Lakebase Autoscaling project id (created by deploy.sh if missing).
+    default: mdm-article-master
+  postgres_database:
+    description: Full resource path of the Lakebase database to attach to the app.
+    default: projects/mdm-article-master/branches/production/databases/databricks-postgres
 
 # The real vendor->region seed CSV is gitignored (customer data kept out of the
 # public repo), but the app needs it at deploy time to seed. Force it into the
@@ -18,9 +32,16 @@ sync:
     - db/seed_data/vendor_supply_region.csv
 
 targets:
+  # Default portable target — the workspace host comes from the --profile you
+  # pass, so deploying to a new workspace is just `./deploy.sh --profile <name>`.
+  dev:
+    default: true
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+
+  # The original hackathon workspace, pinned by host + profile.
   hackathon:
     mode: production
-    default: true
     workspace:
       host: https://fevm-7-eleven-hackathon.cloud.databricks.com
       profile: 711-hackathon

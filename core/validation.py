@@ -13,6 +13,15 @@ def validate_record(domain, values: dict, existing_rows: list[dict],
         if field.required and not values.get(field.name):
             errors.append(f"{field.label} is required.")
 
+    # Choice fields must hold one of their configured options.
+    for field in domain.fields:
+        if field.kind == "choice" and field.options:
+            val = values.get(field.name)
+            if val not in (None, "") and val not in field.options:
+                errors.append(
+                    f"{field.label} must be one of: {', '.join(field.options)}."
+                )
+
     # Effective dating: from_date <= to_date
     frm = values.get("from_date")
     to = values.get("to_date")
@@ -30,8 +39,8 @@ def validate_record(domain, values: dict, existing_rows: list[dict],
             if _overlaps(frm, to, row.get("from_date"), row.get("to_date")):
                 label = " / ".join(str(v) for v in key)
                 errors.append(
-                    f"An overlapping authorisation already exists for {label}. "
-                    "Edit or retire that one instead of creating a duplicate."
+                    f"An overlapping override already exists for {label}. "
+                    "Edit or remove that one instead of creating a duplicate."
                 )
                 break
 
