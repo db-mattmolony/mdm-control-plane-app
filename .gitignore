@@ -9,9 +9,9 @@ __pycache__/
 *.pyc
 .DS_Store
 
-# Real 7-Eleven vendor->region mapping (customer data) — do NOT publish.
-# Regenerate locally from the source spreadsheet with db/seed_data/build_seed.py.
-db/seed_data/vendor_supply_region.csv
+# Seed data (db/seed_data/vendor_supply_region.csv) is now tracked so a clone
+# in any workspace can seed on deploy. Regenerate it from the source spreadsheet
+# with db/seed_data/build_seed.py. The raw spreadsheet itself stays untracked.
 
 # Raw customer source files — kept locally, never committed or uploaded to the
 # workspace by `databricks bundle deploy` (bundle sync honours this file).
